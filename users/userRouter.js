@@ -25,7 +25,7 @@ router.post("/:id/posts", (req, res) => {
     })
     .catch((err) => {
       console.log(err);
-      res.status(500).json({ error: "can't get the posts" });
+      res.status(500).json({ error: "Can't get the posts" });
     });
 });
 
@@ -48,7 +48,7 @@ router.get("/:id", (req, res) => {
     })
     .catch((err) => {
       console.log(err);
-      res.status(500).json({ error: "cannot get the user" });
+      res.status(500).json({ error: "Can't get the user" });
     });
 });
 
@@ -60,7 +60,7 @@ router.get("/:id/posts", (req, res) => {
     })
     .catch((err) => {
       console.log(err);
-      res.status(500).json({ error: "can't get the posts" });
+      res.status(500).json({ error: "Can't get the posts." });
     });
 });
 
@@ -72,7 +72,7 @@ router.delete("/:id", (req, res) => {
     })
     .catch((err) => {
       console.log(err);
-      res.status(500).json({ error: "can't remove user" });
+      res.status(500).json({ error: "Can't remove user." });
     });
 });
 
@@ -84,7 +84,7 @@ router.put("/:id", (req, res) => {
     })
     .catch((err) => {
       console.log(err);
-      res.status(500).json({ error: "can't update user" });
+      res.status(500).json({ error: "Can't update user." });
     });
 });
 
