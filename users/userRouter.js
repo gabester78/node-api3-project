@@ -4,7 +4,7 @@ const router = express.Router();
 const db = require("./userDb");
 const postDb = require("../posts/postDb");
 
-router.post("/", (req, res) => {
+router.post("/", validateUser, (req, res) => {
   db.insert(req.body)
     .then((article) => {
       res.status(201).json(article);
@@ -17,7 +17,8 @@ router.post("/", (req, res) => {
     });
 });
 
-router.post("/:id/posts", (req, res) => {
+router.post("/:id/posts", validatePost, (req, res) => {
+  req.body.user_id = req.params.id;
   postDb
     .insert(req.body)
     .then((post) => {
@@ -25,7 +26,7 @@ router.post("/:id/posts", (req, res) => {
     })
     .catch((err) => {
       console.log(err);
-      res.status(500).json({ error: "Can't get the posts" });
+      res.status(500).json({ error: "Can't post the message." });
     });
 });
 
@@ -36,11 +37,11 @@ router.get("/", (req, res) => {
     })
     .catch((err) => {
       console.log(err);
-      res.status(500).json({ error: "Users not found" });
+      res.status(500).json({ error: "Users not found." });
     });
 });
 
-router.get("/:id", (req, res) => {
+router.get("/:id", validateUserId, (req, res) => {
   let id = req.params.id;
   db.getById(id)
     .then((post) => {
@@ -52,7 +53,7 @@ router.get("/:id", (req, res) => {
     });
 });
 
-router.get("/:id/posts", (req, res) => {
+router.get("/:id/posts", validateUserId, (req, res) => {
   let id = req.params.id;
   db.getUserPosts(id)
     .then((user) => {
@@ -64,7 +65,7 @@ router.get("/:id/posts", (req, res) => {
     });
 });
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", validateUserId, (req, res) => {
   let id = req.params.id;
   db.remove(id)
     .then((user) => {
@@ -76,7 +77,7 @@ router.delete("/:id", (req, res) => {
     });
 });
 
-router.put("/:id", (req, res) => {
+router.put("/:id", validateUserId, (req, res) => {
   let id = req.params.id;
   db.update(id, req.body)
     .then((user) => {
@@ -91,15 +92,47 @@ router.put("/:id", (req, res) => {
 //custom middleware
 
 function validateUserId(req, res, next) {
-  // do your magic!
+  db.getById(req.params.id)
+    .then((users) => {
+      if (users) {
+        next();
+      } else {
+        res.status(404).send("User doesn't exsist");
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send("Error validating user id");
+    });
 }
 
 function validateUser(req, res, next) {
-  // do your magic!
+  // console.log("obkeys", Object.keys(req.body));
+  if (Object.keys(req.body).length === 0) {
+    res.status(400).json({
+      errorMessage: "User data is missing",
+    });
+  } else if (req.body.name === undefined || req.body.name === "") {
+    res.status(400).json({
+      errorMessage: "User name is missing",
+    });
+  } else {
+    next();
+  }
 }
 
 function validatePost(req, res, next) {
-  // do your magic!
+  if (Object.keys(req.body).length === 0) {
+    res.status(400).json({
+      errorMessage: "Post text is missing",
+    });
+  } else if (req.body.text === undefined || req.body.text === "") {
+    res.status(400).json({
+      errorMessage: "Post text is missing",
+    });
+  } else {
+    next();
+  }
 }
 
 module.exports = router;
